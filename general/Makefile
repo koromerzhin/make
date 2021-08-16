@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-COMMAND_ARGS := $(filter-out $@,$(MAKECMDGOALS))
+COMMAND_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
 .PHONY: sleep
 sleep: ## sleep *

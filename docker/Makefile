@@ -8,7 +8,11 @@ else
 endif
 
 docker: isdocker ## Scripts docker *
-ifeq ($(COMMAND_ARGS),create-network)
+ifeq ($(COMMAND_ARGS),images)
+	@docker images
+else ifeq ($(COMMAND_ARGS),login)
+	@docker login
+else ($(COMMAND_ARGS),create-network)
 	@docker network create --driver=overlay $(NETWORK)
 else ifeq ($(COMMAND_ARGS),image-pull)
 	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i; done
@@ -23,6 +27,8 @@ else
 	@echo "---"
 	@echo "make docker ARGUMENT"
 	@echo "---"
+	@echo "images: images"
+	@echo "login: login"
 	@echo "create-network: create network"
 	@echo "image-pull: Get docker image"
 	@echo "deploy: deploy"

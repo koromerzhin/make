@@ -32,6 +32,12 @@ else
 	@echo "generate: GENERATE"
 endif
 
+.PHONY: git
+check: node_modules ## check
+	@make contributors check -i
+	@make linter all -i
+	@git status
+
 .PHONY: help
 help:
 	@echo "* : arguments nécéssaire"

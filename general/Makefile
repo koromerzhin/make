@@ -1,21 +1,26 @@
 .DEFAULT_GOAL := help
 
-COMMAND_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+GENERAL_SUPPORTED_COMMANDS := contributors
+GENERAL_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(GENERAL_SUPPORTED_COMMANDS))
+ifneq "$(GENERAL_SUPPORTS_MAKE_ARGS)" ""
+  GENERAL_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(GENERAL_ARGS):;@:)
+endif
 
 .PHONY: sleep
 sleep: ## sleep *
-	@sleep  $(COMMAND_ARGS)
+	@sleep  $(GENERAL_ARGS)
 
 node_modules:
 	@npm install
 
 .PHONY: contributors
 contributors: node_modules ## Contributors *
-ifeq ($(COMMAND_ARGS),add)
+ifeq ($(GENERAL_ARGS),add)
 	@npm run contributors add
-else ifeq ($(COMMAND_ARGS),check)
+else ifeq ($(GENERAL_ARGS),check)
 	@npm run contributors check
-else ifeq ($(COMMAND_ARGS),generate)
+else ifeq ($(GENERAL_ARGS),generate)
 	@npm run contributors generate
 else
 	@echo "ARGUMENT missing"

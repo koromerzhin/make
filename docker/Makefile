@@ -10,6 +10,8 @@ endif
 docker: isdocker ## Scripts docker *
 ifeq ($(COMMAND_ARGS),images)
 	@docker images
+else ifeq ($(COMMAND_ARGS),swarm-init)
+	@docker swarm init --default-addr-pool 10.20.0.0/16
 else ifeq ($(COMMAND_ARGS),login)
 	@docker login
 else ifeq ($(COMMAND_ARGS),create-network)
@@ -28,6 +30,7 @@ else
 	@echo "make docker ARGUMENT"
 	@echo "---"
 	@echo "images: images"
+	@echo "swarm-init: swarm init"
 	@echo "login: login"
 	@echo "create-network: create network"
 	@echo "image-pull: Get docker image"

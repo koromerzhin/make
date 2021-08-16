@@ -2,6 +2,10 @@
 
 COMMAND_ARGS := $(filter-out $@,$(MAKECMDGOALS))
 
+.PHONY: sleep
+sleep: ## sleep *
+	@sleep  $(COMMAND_ARGS)
+
 node_modules:
 	@npm install
 

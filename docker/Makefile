@@ -1,10 +1,33 @@
 .PHONY: isdocker
-isdocker: ## Docker is launch
+isdocker: ## Docker is launch ?
 ifeq ($(shell docker info > /dev/null 2>&1 && echo 1), 0)
 	@echo "Docker is not launch"
 	exit 1
 else
 	@echo "Docker is launch"
+endif
+
+docker: isdocker ## Scripts docker *
+ifeq ($(COMMAND_ARGS),create-network)
+	@docker network create --driver=overlay $(NETWORK)
+else ifeq ($(COMMAND_ARGS),image-pull)
+	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i; done
+else ifeq ($(COMMAND_ARGS),deploy)
+	@docker stack deploy -c docker-compose.yml $(STACK)
+else ifeq ($(COMMAND_ARGS),ls)
+	@docker stack services $(STACK)
+else ifeq ($(COMMAND_ARGS),stop)
+	@docker stack rm $(STACK)
+else
+	@echo "ARGUMENT missing"
+	@echo "---"
+	@echo "make docker ARGUMENT"
+	@echo "---"
+	@echo "create-network: create network"
+	@echo "image-pull: Get docker image"
+	@echo "deploy: deploy"
+	@echo "ls: docker service"
+	@echo "stop: docker stop"
 endif
 
 .PHONY: logs

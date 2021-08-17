@@ -15,7 +15,7 @@ else
 endif
 
 .PHONY: docker
-docker: isdocker ## Scripts docker *
+docker: isdocker ### Scripts docker
 ifeq ($(DOCKER_ARGS),images)
 	@docker images
 else ifeq ($(DOCKER_ARGS),swarm-init)
@@ -48,7 +48,7 @@ else
 endif
 
 .PHONY: logs
-logs: isdocker ## Scripts logs *
+logs: isdocker ### Scripts logs
 ifeq ($(DOCKER_ARGS),)
 	@echo "ARGUMENT missing"
 	@echo "---"
@@ -60,7 +60,7 @@ else
 endif
 
 .PHONY: ssh
-ssh: isdocker ## SSH *
+ssh: isdocker ### SSH
 ifeq ($(DOCKER_ARGS),)
 	@echo "ARGUMENT missing"
 	@echo "---"
@@ -72,7 +72,7 @@ else
 endif
 
 .PHONY: inspect
-inspect: isdocker ## docker service inspect *
+inspect: isdocker ### docker service inspect
 ifeq ($(DOCKER_ARGS),)
 	@echo "ARGUMENT missing"
 	@echo "---"
@@ -84,7 +84,7 @@ else
 endif
 
 .PHONY: update
-update: isdocker ## docker service update *
+update: isdocker ### docker service update
 ifeq ($(DOCKER_ARGS),)
 	@echo "ARGUMENT missing"
 	@echo "---"

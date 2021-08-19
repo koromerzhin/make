@@ -19,11 +19,7 @@ endif
 .PHONY: lampy
 lampy: ## Install lampy
 ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
-	@cd lampy
-	@make docker create-network
-	@make docker image-pull
-	@make docker deploy
-	@make sleep 60
+	@cd lampy && make docker create-network && make docker image-pull && make docker deploy && make sleep 60
 else
 	@echo "Lampy is running"
 endif
@@ -43,7 +39,7 @@ else ifeq ($(DOCKER_ARGS),login)
 else ifeq ($(DOCKER_ARGS),create-network)
 	@$(foreach network,${NETWORK},$(call Docker_create_network,$(network)))
 else ifeq ($(DOCKER_ARGS),image-pull)
-	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i; done
+	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i -q; done
 else ifeq ($(DOCKER_ARGS),deploy)
 	@docker stack deploy -c docker-compose.yml $(STACK)
 else ifeq ($(DOCKER_ARGS),ls)

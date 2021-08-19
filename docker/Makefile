@@ -1,3 +1,6 @@
+LAMPY_REPO := git@github.com:koromerzhin/lampy.git
+LAMPY_NAME := lampy
+
 DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker
 DOCKER_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(DOCKER_SUPPORTED_COMMANDS))
 ifneq "$(DOCKER_SUPPORTS_MAKE_ARGS)" ""
@@ -12,6 +15,19 @@ ifeq ($(shell docker info > /dev/null 2>&1 && echo 1), 0)
 	exit 1
 else
 	@echo "Docker is launch"
+endif
+
+.PHONY: lampy
+lampy: ## Install lampy
+ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
+	@git clone $(LAMPY_REPO)
+	@cd lampy
+	@make docker create-network
+	@make docker image-pull
+	@make docker deploy
+	@make sleep 60
+else
+	@echo "Lampy is running"
 endif
 
 define Docker_create_network

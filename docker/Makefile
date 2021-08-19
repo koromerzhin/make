@@ -14,6 +14,10 @@ else
 	@echo "Docker is launch"
 endif
 
+define Docker_create_network
+	docker network create --driver=overlay $(1);
+endef
+
 .PHONY: docker
 docker: isdocker ### Scripts docker
 ifeq ($(DOCKER_ARGS),images)
@@ -23,7 +27,7 @@ else ifeq ($(DOCKER_ARGS),swarm-init)
 else ifeq ($(DOCKER_ARGS),login)
 	@docker login
 else ifeq ($(DOCKER_ARGS),create-network)
-	@docker network create --driver=overlay $(NETWORK)
+	@$(foreach network,${NETWORK},$(call Docker_create_network,$(network)))
 else ifeq ($(DOCKER_ARGS),image-pull)
 	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i; done
 else ifeq ($(DOCKER_ARGS),deploy)

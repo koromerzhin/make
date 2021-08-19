@@ -1,4 +1,3 @@
-LAMPY_REPO := git@github.com:koromerzhin/lampy.git
 LAMPY_NAME := lampy
 
 DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker
@@ -20,7 +19,6 @@ endif
 .PHONY: lampy
 lampy: ## Install lampy
 ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
-	@git clone $(LAMPY_REPO)
 	@cd lampy
 	@make docker create-network
 	@make docker image-pull

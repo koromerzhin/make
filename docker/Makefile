@@ -19,7 +19,10 @@ endif
 .PHONY: lampy
 lampy: ## Install lampy
 ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
-	@cd lampy && make docker create-network && make docker image-pull && make docker deploy && make sleep 60
+	@cd lampy && make docker create-network
+	@cd lampy && make docker image-pull
+	@cd lampy && make docker deploy
+	@cd lampy && make sleep 60
 else
 	@echo "Lampy is running"
 endif

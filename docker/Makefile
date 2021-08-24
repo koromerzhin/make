@@ -23,6 +23,7 @@ ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make docker image-pull
 	@cd lampy && make docker deploy
 	@cd lampy && make sleep 60
+	@cd lampy && make docker ls
 else
 	@echo "Lampy is running"
 endif

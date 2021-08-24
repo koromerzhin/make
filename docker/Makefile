@@ -18,29 +18,12 @@ endif
 
 .PHONY: lampy
 lampy: isdocker ### Lampy install
-ifeq ($(DOCKER_ARGS),images)
 	@cd lampy && make docker create-network
-else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker image-pull
-else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker deploy
-else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make sleep 60
-else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker ls
-else ifeq ($(DOCKER_ARGS),swarm-init)
 	docker network create --driver=overlay $(1);
-else
-	@echo "ARGUMENT missing"
-	@echo "---"
-	@echo "make lampy ARGUMENT"
-	@echo "---"
-	@echo "network: network"
-	@echo "image-pull: image-pull"
-	@echo "deploy: deploy"
-	@echo "sleep: sleep"
-	@echo "docker-ls: docker-ls"
-endif
 
 define Docker_create_network
 	docker network create --driver=overlay $(1);

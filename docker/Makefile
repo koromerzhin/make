@@ -24,6 +24,7 @@ ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make docker deploy
 	@cd lampy && make sleep 180
 	@cd lampy && make docker ls
+	@cd lampy && make logs mariadb
 else
 	@echo "Lampy is running"
 endif

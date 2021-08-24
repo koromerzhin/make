@@ -23,7 +23,6 @@ lampy: isdocker ### Lampy install
 	@cd lampy && make docker deploy
 	@cd lampy && make sleep 60
 	@cd lampy && make docker ls
-	docker network create --driver=overlay $(1);
 
 define Docker_create_network
 	docker network create --driver=overlay $(1);

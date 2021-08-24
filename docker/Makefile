@@ -16,13 +16,42 @@ else
 	@echo "Docker is launch"
 endif
 
-.PHONY: lampy
-lampy: ## Install lampy
+.PHONY: lampy-network
+lampy-network: ## Install lampy
 ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make docker create-network
+else
+	@echo "Lampy is running"
+endif
+
+.PHONY: lampy-image-pull
+lampy-image-pull: ## Install lampy
+ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make docker image-pull
+else
+	@echo "Lampy is running"
+endif
+
+.PHONY: lampy-deploy
+lampy-deploy: ## Install lampy
+ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make docker deploy
+else
+	@echo "Lampy is running"
+endif
+
+.PHONY: lampy-sleep
+lampy-sleep: ## Install lampy
+ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
 	@cd lampy && make sleep 360
+else
+	@echo "Lampy is running"
+endif
+
+.PHONY: lampy-docker-ls
+lampy-docker-ls: ## Install lampy
+ifeq ($(shell docker ps | grep $(LAMPY_NAME)), )
+	@cd lampy && make docker ls
 else
 	@echo "Lampy is running"
 endif

@@ -1,6 +1,6 @@
 LAMPY_NAME := lampy
 
-DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker
+DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker lampy
 DOCKER_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(DOCKER_SUPPORTED_COMMANDS))
 ifneq "$(DOCKER_SUPPORTS_MAKE_ARGS)" ""
   DOCKER_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -16,25 +16,31 @@ else
 	@echo "Docker is launch"
 endif
 
-.PHONY: lampy-network
-lampy-network: isdocker ## Install lampy
+.PHONY: lampy
+lampy: isdocker ### Lampy install
+ifeq ($(DOCKER_ARGS),images)
 	@cd lampy && make docker create-network
-
-.PHONY: lampy-image-pull
-lampy-image-pull: isdocker ## Install lampy
+else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker image-pull
-
-.PHONY: lampy-deploy
-lampy-deploy: isdocker ## Install lampy
+else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker deploy
-
-.PHONY: lampy-sleep
-lampy-sleep: isdocker ## Install lampy
+else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make sleep 60
-
-.PHONY: lampy-docker-ls
-lampy-docker-ls: isdocker ## Install lampy
+else ifeq ($(DOCKER_ARGS),swarm-init)
 	@cd lampy && make docker ls
+else ifeq ($(DOCKER_ARGS),swarm-init)
+	docker network create --driver=overlay $(1);
+else
+	@echo "ARGUMENT missing"
+	@echo "---"
+	@echo "make lampy ARGUMENT"
+	@echo "---"
+	@echo "network: network"
+	@echo "image-pull: image-pull"
+	@echo "deploy: deploy"
+	@echo "sleep: sleep"
+	@echo "docker-ls: docker-ls"
+endif
 
 define Docker_create_network
 	docker network create --driver=overlay $(1);

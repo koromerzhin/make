@@ -30,7 +30,7 @@ lampy-deploy: isdocker ## Install lampy
 
 .PHONY: lampy-sleep
 lampy-sleep: isdocker ## Install lampy
-	@cd lampy && make sleep 360
+	@cd lampy && make sleep 60
 
 .PHONY: lampy-docker-ls
 lampy-docker-ls: isdocker ## Install lampy

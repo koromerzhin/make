@@ -20,8 +20,6 @@ isdocker: ## Docker is launch ?
 ifeq ($(shell docker info > /dev/null 2>&1 && echo 1), 0)
 	@echo "Docker is not launch"
 	exit 1
-else
-	@echo "Docker is launch"
 endif
 
 .PHONY: lampy

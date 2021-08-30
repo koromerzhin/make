@@ -82,7 +82,7 @@ ifeq ($(DOCKER_ARGS),)
 	@echo "---"
 	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "\033[32m%-20s\033[0m %s\n" $$i $$i; done
 else
-	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) sh
+	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) bash
 endif
 
 .PHONY: inspect

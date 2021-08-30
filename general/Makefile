@@ -7,6 +7,15 @@ ifneq "$(GENERAL_SUPPORTS_MAKE_ARGS)" ""
   $(eval $(GENERAL_ARGS):;@:)
 endif
 
+GREEN := \033[0;32m
+RED := \033[0;31m
+YELLOW := \033[0;33m
+PURPLE := \033[0;35m
+NC := \033[0m
+NEED := ${GREEN}%-20s${NC}: %s\n
+MISSING :=${RED}ARGUMENT missing${NC}\n
+ARGUMENTS := make ${PURPLE}%s${NC} ${YELLOW}ARGUMENT${NC}\n
+
 .PHONY: sleep
 sleep: ### sleep
 	@sleep  $(GENERAL_ARGS)
@@ -23,13 +32,13 @@ else ifeq ($(GENERAL_ARGS),check)
 else ifeq ($(GENERAL_ARGS),generate)
 	@npm run contributors generate
 else
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
-	@echo "make git ARGUMENT"
+	@printf "${ARGUMENTS}" contributors
 	@echo "---"
-	@echo "add: ADD"
-	@echo "check: CHECK"
-	@echo "generate: GENERATE"
+	@printf "${NEED}" "add" "ADD"
+	@printf "${NEED}" "check" "CHECK"
+	@printf "${NEED}" "generate" "GENERATE"
 endif
 
 .PHONY: git
@@ -41,5 +50,5 @@ check: node_modules ## check
 .PHONY: help
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*? ## .*$$)|(^ ##)' $(MAKEFILE_LIST) | sed -e "s/^.*Makefile://" | awk 'BEGIN {FS = ":.*? ## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
-	@printf "\033[0;33mcommands with arguments\033[0m\n"
+	@printf "${YELLOW}commands with arguments${NC}\n"
 	@grep -E '(^[a-zA-Z_-]+:.*? ### .*$$)|(^ ###)' $(MAKEFILE_LIST) | sed -e "s/^.*Makefile://" | awk 'BEGIN {FS = ":.*? ### "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'

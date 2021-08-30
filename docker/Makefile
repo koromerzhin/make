@@ -7,6 +7,14 @@ ifneq "$(DOCKER_SUPPORTS_MAKE_ARGS)" ""
   $(eval $(DOCKER_ARGS):;@:)
 endif
 
+GREEN := \033[0;32m
+RED := \033[0;31m
+YELLOW := \033[0;33m
+NC := \033[0m
+NEED := ${GREEN}%-20s${NC}: %s\n
+MISSING :=${RED}ARGUMENT missing${NC}\n
+ARGUMENTS := make ${PURPLE}%s${NC} ${YELLOW}ARGUMENT${NC}\n
+
 .PHONY: isdocker
 isdocker: ## Docker is launch ?
 ifeq ($(shell docker info > /dev/null 2>&1 && echo 1), 0)
@@ -28,6 +36,10 @@ define Docker_create_network
 	docker network create --driver=overlay $(1);
 endef
 
+define Docker_stack_container
+	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "${NEED}" $$i $$i; done
+endef
+
 .PHONY: docker
 docker: isdocker ### Scripts docker
 ifeq ($(DOCKER_ARGS),images)
@@ -47,28 +59,28 @@ else ifeq ($(DOCKER_ARGS),ls)
 else ifeq ($(DOCKER_ARGS),stop)
 	@docker stack rm $(STACK)
 else
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
-	@echo "make docker ARGUMENT"
+	@printf "${ARGUMENTS}" docker
 	@echo "---"
-	@echo "images: images"
-	@echo "swarm-init: swarm init"
-	@echo "login: login"
-	@echo "create-network: create network"
-	@echo "image-pull: Get docker image"
-	@echo "deploy: deploy"
-	@echo "ls: docker service"
-	@echo "stop: docker stop"
+	@printf "${NEED}" "images" "images"
+	@printf "${NEED}" "swarm-init" "swarm init"
+	@printf "${NEED}" "login" "login"
+	@printf "${NEED}" "create-network" "create network"
+	@printf "${NEED}" "image-pull" "Get docker image"
+	@printf "${NEED}" "deploy" "deploy"
+	@printf "${NEED}" "ls" "docker service"
+	@printf "${NEED}" "stop" "docker stop"
 endif
 
 .PHONY: logs
 logs: isdocker ### Scripts logs
 ifeq ($(DOCKER_ARGS),)
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
-	@echo "make logs ARGUMENT"
+	@printf "${ARGUMENTS}" logs
 	@echo "---"
-	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "\033[32m%-20s\033[0m %s\n" $$i $$i; done
+	$(call Docker_stack_container)
 else
 	@docker service logs -f --tail 100 --raw $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1)
 endif
@@ -76,11 +88,11 @@ endif
 .PHONY: ssh
 ssh: isdocker ### SSH
 ifeq ($(DOCKER_ARGS),)
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
-	@echo "make ssh ARGUMENT"
+	@printf "${ARGUMENTS}" ssh
 	@echo "---"
-	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "\033[32m%-20s\033[0m %s\n" $$i $$i; done
+	$(call Docker_stack_container)
 else
 	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) sh
 endif
@@ -88,11 +100,11 @@ endif
 .PHONY: inspect
 inspect: isdocker ### docker service inspect
 ifeq ($(DOCKER_ARGS),)
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
 	@echo "make inspect ARGUMENT"
 	@echo "---"
-	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "\033[32m%-20s\033[0m %s\n" $$i $$i; done
+	$(call Docker_stack_container)
 else
 	@docker service inspect $(STACK)_$(DOCKER_ARGS)
 endif
@@ -100,11 +112,11 @@ endif
 .PHONY: update
 update: isdocker ### docker service update
 ifeq ($(DOCKER_ARGS),)
-	@echo "ARGUMENT missing"
+	@printf "${MISSING}"
 	@echo "---"
-	@echo "make update ARGUMENT"
+	@printf "${ARGUMENTS}" update
 	@echo "---"
-	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "\033[32m%-20s\033[0m %s\n" $$i $$i; done
+	$(call Docker_stack_container)
 else
 	@docker service update $(STACK)_$(DOCKER_ARGS)
 endif

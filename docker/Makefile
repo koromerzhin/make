@@ -7,14 +7,6 @@ ifneq "$(DOCKER_SUPPORTS_MAKE_ARGS)" ""
   $(eval $(DOCKER_ARGS):;@:)
 endif
 
-GREEN := \033[0;32m
-RED := \033[0;31m
-YELLOW := \033[0;33m
-NC := \033[0m
-NEED := ${GREEN}%-20s${NC}: %s\n
-MISSING :=${RED}ARGUMENT missing${NC}\n
-ARGUMENTS := make ${PURPLE}%s${NC} ${YELLOW}ARGUMENT${NC}\n
-
 .PHONY: isdocker
 isdocker: ## Docker is launch ?
 ifeq ($(shell docker info > /dev/null 2>&1 && echo 1), 0)
@@ -57,10 +49,7 @@ else ifeq ($(DOCKER_ARGS),ls)
 else ifeq ($(DOCKER_ARGS),stop)
 	@docker stack rm $(STACK)
 else
-	@printf "${MISSING}"
-	@echo "---"
-	@printf "${ARGUMENTS}" docker
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" docker
 	@printf "${NEED}" "images" "images"
 	@printf "${NEED}" "swarm-init" "swarm init"
 	@printf "${NEED}" "login" "login"
@@ -74,10 +63,7 @@ endif
 .PHONY: logs
 logs: isdocker ### Scripts logs
 ifeq ($(DOCKER_ARGS),)
-	@printf "${MISSING}"
-	@echo "---"
-	@printf "${ARGUMENTS}" logs
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" logs
 	$(call Docker_stack_container)
 else
 	@docker service logs -f --tail 100 --raw $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1)
@@ -86,10 +72,7 @@ endif
 .PHONY: ssh
 ssh: isdocker ### SSH
 ifeq ($(DOCKER_ARGS),)
-	@printf "${MISSING}"
-	@echo "---"
-	@printf "${ARGUMENTS}" ssh
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" ssh
 	$(call Docker_stack_container)
 else
 	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) sh
@@ -98,10 +81,7 @@ endif
 .PHONY: inspect
 inspect: isdocker ### docker service inspect
 ifeq ($(DOCKER_ARGS),)
-	@printf "${MISSING}"
-	@echo "---"
-	@echo "make inspect ARGUMENT"
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" inspect
 	$(call Docker_stack_container)
 else
 	@docker service inspect $(STACK)_$(DOCKER_ARGS)
@@ -110,10 +90,7 @@ endif
 .PHONY: update
 update: isdocker ### docker service update
 ifeq ($(DOCKER_ARGS),)
-	@printf "${MISSING}"
-	@echo "---"
-	@printf "${ARGUMENTS}" update
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" update
 	$(call Docker_stack_container)
 else
 	@docker service update $(STACK)_$(DOCKER_ARGS)

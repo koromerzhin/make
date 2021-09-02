@@ -13,8 +13,7 @@ YELLOW := \033[0;33m
 PURPLE := \033[0;35m
 NC := \033[0m
 NEED := ${GREEN}%-20s${NC}: %s\n
-MISSING :=${RED}ARGUMENT missing${NC}\n
-ARGUMENTS := make ${PURPLE}%s${NC} ${YELLOW}ARGUMENT${NC}\n
+MISSING_ARGUMENTS :=${RED}ARGUMENT missing${NC}\n---\nmake ${PURPLE}%s${NC} ${YELLOW}ARGUMENT${NC}\n---\n
 
 .PHONY: sleep
 sleep: ### sleep
@@ -32,10 +31,7 @@ else ifeq ($(GENERAL_ARGS),check)
 else ifeq ($(GENERAL_ARGS),generate)
 	@npm run contributors generate
 else
-	@printf "${MISSING}"
-	@echo "---"
-	@printf "${ARGUMENTS}" contributors
-	@echo "---"
+	@printf "${MISSING_ARGUMENTS}" contributors
 	@printf "${NEED}" "add" "ADD"
 	@printf "${NEED}" "check" "CHECK"
 	@printf "${NEED}" "generate" "GENERATE"

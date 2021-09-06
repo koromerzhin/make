@@ -50,14 +50,16 @@ else ifeq ($(DOCKER_ARGS),stop)
 	@docker stack rm $(STACK)
 else
 	@printf "${MISSING_ARGUMENTS}" docker
-	@printf "${NEED}" "images" "images"
-	@printf "${NEED}" "swarm-init" "swarm init"
-	@printf "${NEED}" "login" "login"
-	@printf "${NEED}" "create-network" "create network"
-	@printf "${NEED}" "image-pull" "Get docker image"
-	@printf "${NEED}" "deploy" "deploy"
-	@printf "${NEED}" "ls" "docker service"
-	@printf "${NEED}" "stop" "docker stop"
+	$(call array_arguments, \
+		["images"]="images" \
+		["swarm-init"]="swarm init" \
+		["login"]="login" \
+		["create-network"]="create network" \
+		["image-pull"]="Get docker image" \
+		["deploy"]="deploy" \
+		["ls"]="docker service" \
+		["stop"]="docker stop" \
+	)
 endif
 
 .PHONY: logs

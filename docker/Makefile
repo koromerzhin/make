@@ -77,7 +77,7 @@ ifeq ($(DOCKER_ARGS),)
 	@printf "${MISSING_ARGUMENTS}" ssh
 	$(call Docker_stack_container)
 else
-	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) sh
+	@docker exec -it $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) bash
 endif
 
 .PHONY: inspect

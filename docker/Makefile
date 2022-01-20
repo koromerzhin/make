@@ -19,6 +19,7 @@ endif
 
 .PHONY: lampy
 lampy: isdocker ### Lampy install
+	@cd lampy && make docker swarm-init
 	@cd lampy && make docker create-network
 	@cd lampy && make docker image-pull
 	@cd lampy && make docker deploy

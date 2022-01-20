@@ -1,6 +1,7 @@
 LAMPY_NAME := lampy
 
-DOCKER_EXEC := docker exec -ti
+DOCKER_EXEC := docker exec -i
+DOCKER_EXECTTY := docker exec -ti
 
 DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker lampy
 DOCKER_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(DOCKER_SUPPORTED_COMMANDS))
@@ -79,7 +80,7 @@ ifeq ($(DOCKER_ARGS),)
 	@printf "${MISSING_ARGUMENTS}" ssh
 	$(call Docker_stack_container)
 else
-	@$(DOCKER_EXEC) $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) bash
+	@$(DOCKER_EXECTTY) $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) bash
 endif
 
 .PHONY: inspect

@@ -55,14 +55,14 @@ else ifeq ($(DOCKER_ARGS),stop)
 else
 	@printf "${MISSING_ARGUMENTS}" docker
 	$(call array_arguments, \
-		["images"]="images" \
-		["swarm-init"]="swarm init" \
-		["login"]="login" \
 		["create-network"]="create network" \
-		["image-pull"]="Get docker image" \
 		["deploy"]="deploy" \
+		["image-pull"]="Get docker image" \
+		["images"]="images" \
+		["login"]="login" \
 		["ls"]="docker service" \
 		["stop"]="docker stop" \
+		["swarm-init"]="swarm init" \
 	)
 endif
 

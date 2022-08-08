@@ -1,7 +1,12 @@
 LAMPY_NAME := lampy
 
-DOCKER_EXEC := docker exec -i
-DOCKER_EXECTTY := docker exec -ti
+USER := $(shell id -u)
+GROUP := $(shell id -g)
+
+DOCKER_LAUNCH := USER_ID=$(USER) GROUP_ID=$(GROUP) docker
+
+DOCKER_EXEC := $(DOCKER_LAUNCH) exec -i -u root
+DOCKER_EXECTTY := $(DOCKER_LAUNCH) exec -ti -u root
 
 DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker lampy
 DOCKER_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(DOCKER_SUPPORTED_COMMANDS))
@@ -31,27 +36,27 @@ define Docker_create_network
 endef
 
 define Docker_stack_container
-	@docker stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "${NEED}" $$i $$i; done
+	@$(DOCKER_LAUNCH) stack services $(STACK) --format "{{.Name}}" | sed -e "s/^.*$(STACK)_//" | while read i; do printf "${NEED}" $$i $$i; done
 endef
 
 .PHONY: docker
 docker: isdocker ### Scripts docker
 ifeq ($(DOCKER_ARGS),images)
-	@docker images
+	@$(DOCKER_LAUNCH) images
 else ifeq ($(DOCKER_ARGS),swarm-init)
-	@docker swarm init --default-addr-pool 10.20.0.0/16
+	@$(DOCKER_LAUNCH) swarm init --default-addr-pool 10.20.0.0/16
 else ifeq ($(DOCKER_ARGS),login)
-	@docker login
+	@$(DOCKER_LAUNCH) login
 else ifeq ($(DOCKER_ARGS),create-network)
 	@$(foreach network,${NETWORK},$(call Docker_create_network,$(network)))
 else ifeq ($(DOCKER_ARGS),image-pull)
 	@more docker-compose.yml | grep image: | sed -e "s/^.*image:[[:space:]]//" | while read i; do docker pull $$i -q; done
 else ifeq ($(DOCKER_ARGS),deploy)
-	@docker stack deploy -c docker-compose.yml $(STACK)
+	@$(DOCKER_LAUNCH) stack deploy -c docker-compose.yml $(STACK)
 else ifeq ($(DOCKER_ARGS),ls)
-	@docker stack services $(STACK)
+	@$(DOCKER_LAUNCH) stack services $(STACK)
 else ifeq ($(DOCKER_ARGS),stop)
-	@docker stack rm $(STACK)
+	@$(DOCKER_LAUNCH) stack rm $(STACK)
 else
 	@printf "${MISSING_ARGUMENTS}" docker
 	$(call array_arguments, \
@@ -72,7 +77,7 @@ ifeq ($(DOCKER_ARGS),)
 	@printf "${MISSING_ARGUMENTS}" logs
 	$(call Docker_stack_container)
 else
-	@docker service logs -f --tail 100 --raw $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1)
+	@$(DOCKER_LAUNCH) service logs -f --tail 100 --raw $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1)
 endif
 
 .PHONY: ssh
@@ -90,7 +95,7 @@ ifeq ($(DOCKER_ARGS),)
 	@printf "${MISSING_ARGUMENTS}" inspect
 	$(call Docker_stack_container)
 else
-	@docker service inspect $(STACK)_$(DOCKER_ARGS)
+	@$(DOCKER_LAUNCH) service inspect $(STACK)_$(DOCKER_ARGS)
 endif
 
 .PHONY: update
@@ -99,5 +104,5 @@ ifeq ($(DOCKER_ARGS),)
 	@printf "${MISSING_ARGUMENTS}" update
 	$(call Docker_stack_container)
 else
-	@docker service update $(STACK)_$(DOCKER_ARGS)
+	@$(DOCKER_LAUNCH) service update $(STACK)_$(DOCKER_ARGS)
 endif

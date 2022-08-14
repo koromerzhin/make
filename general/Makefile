@@ -27,7 +27,7 @@ sleep: ### sleep
 	@sleep  $(GENERAL_ARGS)
 
 node_modules:
-	@npm install
+	@npm install --legacy-peer-deps
 
 .PHONY: contributors
 contributors: node_modules ### Contributors

@@ -7,8 +7,9 @@ DOCKER_LAUNCH := USER_ID=$(USER) GROUP_ID=$(GROUP) docker
 
 DOCKER_EXEC := $(DOCKER_LAUNCH) exec -i -u root
 DOCKER_EXECTTY := $(DOCKER_LAUNCH) exec -ti -u root
+DOCKER_CHECK := ./make/docker/healthcheck.sh
 
-DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker lampy
+DOCKER_SUPPORTED_COMMANDS := update inspect ssh logs docker lampy launch
 DOCKER_SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(DOCKER_SUPPORTED_COMMANDS))
 ifneq "$(DOCKER_SUPPORTS_MAKE_ARGS)" ""
   DOCKER_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
@@ -78,6 +79,14 @@ ifeq ($(DOCKER_ARGS),)
 	$(call Docker_stack_container)
 else
 	@$(DOCKER_LAUNCH) service logs -f --tail 100 --raw $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1)
+endif
+
+launch: isdocker ### Waiting while is not running
+ifeq ($(DOCKER_ARGS),)
+	@printf "${MISSING_ARGUMENTS}" launch
+	$(call Docker_stack_container)
+else
+	@$(DOCKER_CHECK) $(STACK)_$(DOCKER_ARGS).1.$$(docker service ps -f 'name=$(STACK)_$(DOCKER_ARGS)' $(STACK)_$(DOCKER_ARGS) -q --no-trunc | head -n1) bash
 endif
 
 .PHONY: ssh
